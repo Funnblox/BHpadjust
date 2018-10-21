@@ -150,5 +150,33 @@ plot(FPmlist,TPmlist, main="Receiver Operating Characteristic Curve(adjusted)",
   xlab="False Positive Rate", ylab="True Positive Rate")
 
 
+
+#Testing effectiveness
+xbar = rep(0, 10000)
+N = 1000 # number of non-zero means
+mu = 2 #non 0 mean
+xbar[1:N] = mu
+z = rnorm(10000, xbar, 1)#1,000 z scores
+p = 2*pnorm(-abs(z)) #  p values
+discovery = p < .05
+TD = sum (discovery)
+TTD =sum(p[1:N]<.05)
+FDR = (TD-TTD)/TD
+print(FDR)
+
+#Padj
+
+xbar = rep(0, 10000)
+N = 1000 # number of non-zero means
+mu = 2 #non 0 mean
+xbar[1:N] = mu
+z = rnorm(10000, xbar, 1)#1,000 z scores
+p = 2*pnorm(-abs(z)) #  p values
+p = Pad(p)
+discovery = p < .05
+TD = sum (discovery)
+TTD =sum(p[1:N]<.05)
+FDR = (TD-TTD)/TD
+print(FDR)
 ```
 
