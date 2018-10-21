@@ -1,0 +1,154 @@
+---
+title: "Controlling False Discovery Rate with Adjusted p values"
+output: html_notebook
+ ---
+
+```{r}
+
+xbar = rep(0, 1000)
+N = 100 # number of non-zero means
+mu = 2 #non 0 mean
+xbar[1:N] = mu
+
+
+
+alpha = seq(from=0,to=1,by=.01)
+FDmlist= c()
+TDmlist = c()
+FPmlist= c()
+TPmlist = c()
+for ( j in 1:length(alpha)){
+  FDlist = c()
+TDlist = c()
+  FPlist = c()
+TPlist = c()
+
+ for (i in 1:1000){
+  z = rnorm(1000, xbar, 1)#1,000 z scores
+p = 2*pnorm(-abs(z)) #  p values
+discovery = p < alpha[j]
+TD = sum (discovery)
+TTD =sum(p[1:N]<alpha[j])
+FDR = (TD-TTD)/TD
+TDR = TTD/TD
+FPR = (TD-TTD)/(1000-N)
+TPR = TTD/ N
+FDlist[i]= FDR
+TDlist[i]=TDR
+FPlist[i]= FPR
+TPlist[i]=TPR
+ }
+
+FDmlist[j]= mean(FDlist)
+TDmlist[j]=mean(TDlist)
+FPmlist[j]= mean(FPlist)
+TPmlist[j]=mean(TPlist)
+}
+
+plot(FDmlist,TDmlist, main="False Discovery Rate vs True Discovery rate",
+  xlab="False Discovery rate", ylab="True Discovery rate")
+plot(FPmlist,TPmlist, main="Receiver Operating Characteristic Curve",
+  xlab="False Positive Rate", ylab="True Positive Rate")
+
+BH = function (p, q){
+  psort = c()
+  ppos = sort.list(p)
+  
+for (i in 1:length(p)){
+  psort[i] = p[ppos[i]]
+}
+  
+  
+ crit = c( )
+ for (k in 1:length(p)){
+   crit[k]= ((k*q)/length(p))
+ }
+sig = c()
+ for(j in 1:length(p)){
+   if (psort[j]< crit[j]){
+     sig[j] = 1
+   }else{
+     sig[j]= 0
+   }
+ }
+return(sig)
+
+}
+
+
+Pad = function(p){
+  psort = c()
+  ppos = sort.list(p)
+  
+for (i in 1:length(p)){
+  psort[i] = p[ppos[i]]
+}
+  adj = c()
+  for (k in 1:length(psort)){
+    ko = 0
+    ki = 0
+    kio = c()
+    ko = psort[k] *(length(psort)/k)
+    if (k<length(psort)){
+      ki = psort[k+1] *(length(psort)/(k+1))
+    }
+    kio = c(ko,ki)
+    adj[k]= min(kio)
+  }
+  Padj = c()
+  for (j in 1:length(p)){
+    Padj[ppos[j]] = adj[j]
+  }
+  return(Padj)
+}
+
+
+xbar = rep(0, 100)
+N = 10 # number of non-zero means
+mu = 2 #non 0 mean
+xbar[1:N] = mu
+
+
+
+alpha = seq(from=0,to=1,by=.01)
+FDmlist= c()
+TDmlist = c()
+FPmlist= c()
+TPmlist = c()
+for ( j in 1:length(alpha)){
+  FDlist = c()
+TDlist = c()
+  FPlist = c()
+TPlist = c()
+
+ for (i in 1:100){
+  z = rnorm(100, xbar, 1)#1,000 z scores
+p = 2*pnorm(-abs(z)) #  p values
+p = Pad(p)
+discovery = p < alpha[j]
+TD = sum (discovery)
+TTD =sum(p[1:N]<alpha[j])
+FDR = (TD-TTD)/TD
+TDR = TTD/TD
+FPR = (TD-TTD)/(100-N)
+TPR = TTD/ N
+FDlist[i]= FDR
+TDlist[i]=TDR
+FPlist[i]= FPR
+TPlist[i]=TPR
+ }
+
+FDmlist[j]= mean(FDlist)
+TDmlist[j]=mean(TDlist)
+FPmlist[j]= mean(FPlist)
+TPmlist[j]=mean(TPlist)
+}
+
+plot(FDmlist,TDmlist, main="False Discovery Rate vs True Discovery rate(adjusted)",
+  xlab="False Discovery rate", ylab="True Discovery rate")
+plot(FPmlist,TPmlist, main="Receiver Operating Characteristic Curve(adjusted)",
+  xlab="False Positive Rate", ylab="True Positive Rate")
+
+
+```
+
