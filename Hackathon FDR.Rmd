@@ -75,7 +75,7 @@ masig = (max(sig))
 sigp = psort[1:masig]
 return(sigp)
 }
-BH(p,.05)
+
 Pad = function(p){
   psort = c()
   ppos = sort.list(p)
