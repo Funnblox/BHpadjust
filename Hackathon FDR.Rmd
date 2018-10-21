@@ -66,16 +66,16 @@ for (i in 1:length(p)){
 sig = c()
  for(j in 1:length(p)){
    if (psort[j]< crit[j]){
-     sig[j] = 1
+     sig[j] = j
    }else{
      sig[j]= 0
    }
  }
-return(sig)
-
+masig = (max(sig))
+sigp = psort[1:masig]
+return(sigp)
 }
-
-
+BH(p,.05)
 Pad = function(p){
   psort = c()
   ppos = sort.list(p)
